@@ -1,9 +1,13 @@
 #include "share/atspre_staload.hats"
+staload _(*anonymous*)="prelude/DATS/array.dats"
+
 fn pp () = print "\n\n\n";
 
 implement main() = let
-  var A = @[double](1.0, 2.0, 4.0, 8.0, 16.0)
-  var d = A[2]
+  //  val v = arrayptr
+  //  val (pf_gc, pf|p, sz) = $arrsz {double}(1.0, 2.0, 4.0, , 8.0, 16.0, 32.0)
+  //  var d = v[2]
+  val d = 2.0
 in
   pp();
   print d;
