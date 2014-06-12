@@ -1,0 +1,3 @@
+#!/bin/sh
+
+patscc $1.dats && ./$1
