@@ -9,19 +9,19 @@
 #
 ######
 
-ATSHOMEQ="$(ATSHOME)"
+ATSHOMEQ=/usr/local
 
 ######
 
-ATSCC=$(ATSHOMEQ)/usr/local/bin/atscc
-ATSOPT=$(ATSHOMEQ)/usr/local/bin/atsopt
+ATSCC=$(ATSHOMEQ)/bin/patscc
+ATSOPT=$(ATSHOMEQ)/bin/patsopt
 
 ######
 
 #
 # HX: Please uncomment the one you want, or skip it entirely
 #
-ATSCCFLAGS=
+ATSCCFLAGS=-DATS_MEMALLOC_LIBC
 #ATSCCFLAGS=-O2
 #
 # '-flto' enables link-time optimization such as inlining lib functions

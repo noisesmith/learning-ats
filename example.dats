@@ -1,284 +1,171 @@
-(* some steps in learning ats *)
+#include "share/atspre_staload.hats"
+fn pp () = print "\n\n\n";
 
-fn pp () = (
-  print_newline();
-  print_newline()
-)
+implement main() = let
+  var A = @[double](1.0, 2.0, 4.0, 8.0, 16.0)
+  var d = A[2]
+in
+  pp();
+  print d;
+  pp();
+  0
+end
+
+////
 
 datatype intopt =
   | no_i of ()
   | an_i of (int)
 
-datatype wtree =
+datatype btree =
   | empty of ()
-  | branch of (intopt, wtree,
-               intopt, wtree,
-               intopt, wtree,
-               intopt, wtree,
-               intopt, wtree,
-               intopt, wtree,
-               intopt, wtree)
+  | branch of (stree, intopt,
+               stree, intopt,
+               stree, intopt,
+               stree, intopt,
+               stree, intopt,
+               stree, intopt,
+               stree)
 
-fun insert (t: wtree, i: int) =
-  case t of
-  | empty() => (no_i(), empty(),
-                no_i(), empty(),
-                no_i(), empty(),
-                an_i(i), empty(),
-                no_i(), empty(),
-                no_i(), empty(),
-                no_i(), empty())
-  | branch(t, a, u, b, v, c, w, d, x, e, y, f, z, g) => 
+fun empty_equal (i: int, I: intopt): bool =
+  case+ I of
+  | no_i() => true
+  | an_i(n) => i = n
 
-implement main () = (
-  pp();
-  p_wtree(insert(0, empty()));  
-  pp();
+fun pr_intopt (i: intopt): void = (
+  print("<");
+  case+ i of
+  | no_i() => print("NaN")
+  | an_i(n) => print(n);
+  print(">")
 )
 
-//// comment to end of file
+fun pr_level(level: int): void =
+  if (level > 0) then (print("\t"); pr_level(level - 1))
 
-// datatypes
-
-datatype intopt =
-  | intopt_none of ()
-  | intopt_some of (int)
-
-fun safe_div (x: int, y: int): intopt =
-  if (y = 0)
-  then intopt_none()
-  else intopt_some(x/y)
-
-fun pr_intopt (i: intopt): void =
-  case i of
-  | intopt_none() => print("NaN")
-  | intopt_some(n) => print(n)
-
-implement main () = (
-  pp();
-  pr_intopt(safe_div (1, 0));
-  pp();
-  pr_intopt(safe_div (5, 2));
-  pp();
-)
-
-// HOF and computed type signatures
-
-typedef I (a: t@ype) = a -<cloref1> a
-
-fun adder (x: double): I(double) = lam y => x + y
-
-val inc = adder 1.0
-val dec = adder ~1.0
-
-fun twice (f: I(double)): I(double) = lam x => f(f(x))
-
-val plpl = twice inc
-
-val mnmn = twice dec
-
-implement main () = (
-  pp();
-  print(plpl 1.0);
-  pp();
-  print(mnmn 1.0);
-  pp();
-)
-
-// we can return a function at runtime
-
-fun adder (x: int): int -<cloref1> int = lam y => x + y
-
-val inc = adder 1
-val dec = adder ~1
-
-implement main () = (
-  pp();
-  print(inc 3);
-  pp();
-  print(dec 3);
-  pp()
-)
-
-// lexical closure
-// functions can be closed over or not
-
-fun closing (n: int): double =
-  let
-    fun closed (i: int, acc: double):<cloref1> double = (
-      if i <= n then closed (i+1, acc*acc) else acc
+fun pr_stree(s: stree): void =
+  pr(b, 0) where {
+    fun p_branch(l: int, s: stree, c: char) = (
+      pr_level(l);
+      print(c);
+      print(":\n");
+      pr(s, l + 1)
     )
-  in
-    closed(0, 1.3)
-end
-
-implement main () = (
-  pp();
-  print(closing 10);
-  pp()
-)
-
-// we have tail recursion!
-fun sump (n: int, acc: int): int = if n >= 1 then sump (n-1, acc+n) else acc
-
-fun suml (n: int): int = sump( n, 0 )
-
-implement main () = (
-  pp ();
-  print(suml 1000000);
-  pp ();
-)
-
-
-// this is not how we do function overloading, it is just wrong
-// fn abs (x: int): int = if x >= 0 then x else ~x
-
-fn abs (x: double): double = if x >= 0.0 then x else ~x
-
-implement main () = (
-  pp ();
-  print (abs ~1.0);
-  pp ();
-  print (abs 1.0);
-  pp ()
-)
-
-// another way to do args, yay currying
-implement main () = (
-  pp ();
-  print "hello";
-  pp ();
-)
-
-val t = if true then ~1 else 1
-// val t = if true then ~1 // this is an error because of the implicit else ()
-// var t = if true then ~1 else 1 // this is an error because of scoping
-
-
-implement main () = (
-  pp();
-  print(t);
-  pp()
-)
-
-typedef point = @{ x= double, y= double }
-
-val origin = @{ x= 1.02, y= 2.31 }
-
-fn frob (p: point) : double =
-  p.x * p.y * p.x * p.y
-
-fn pr (p: point) : void = (
-  print("@{ x= ");
-  print(p.x);
-  print(", y= ");
-  print(p.y);
-  print(" }")
-)
-
-implement main () = (
-  pp();
-  pr(origin);
-  print(' ');
-  print(frob(origin));
-  pp()
-)
-
-fn extract (a: double,b: double,c: double): double =
-    a + b * c
-
-implement main () = (
-  pp();
-  print(extract(1.133,2.92,3.11111));
-  pp()
-)
-
-local // similar to let, but for making bindings not returning a value
-
-val a = 4.1 and b = 2.2
-
-in
-
-val c = a * b * b + a
-
-end
-
-fun run () = (
-  print (c);
-  print (' ');
-  print (c);
-  print_newline();
-)
-
-
-implement main () = run()
-
-implement main () = begin
-  print ("Hello, world!");
-  print_newline ()
-end
-
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
-
-// two alternate ways of expressing locals
-val area = let
-  val PI = 3.14 and radius = 10.0 in PI * radius * radius
-end
-
-val area2 =
-  PI * radius * radius where {
-    val PI = 3.14 and radius = 11.0
+    and print_empty(l: int): void = (pr_level(l); print("empty"))
+    and pr(s: stree, lv: int): void = (
+      case+ s of
+      | empty() => print_empty(lv)
+      | branch(a, i,
+               b, j,
+               c, k,
+               d, l,
+               e, m,
+               f, n,
+               g) => (
+          p_branch(lv, a, 'a');
+          print("\n");
+          pr_level(lv); pr_intopt(i);
+          print("\n");
+          p_branch(lv, b, 'b');
+          print("\n");
+          pr_level(lv); pr_intopt(j);
+          print("\n");
+          p_branch(lv, c, 'c');
+          print("\n");
+          pr_level(lv); pr_intopt(k);
+          print("\n");
+          p_branch(lv, d, 'd');
+          print("\n");
+          pr_level(lv); pr_intopt(l);
+          print("\n");
+          p_branch(lv, e, 'e');
+          print("\n");
+          pr_level(lv); pr_intopt(m);
+          print("\n");
+          p_branch(lv, f, 'f');
+          print("\n");
+          pr_level(lv); pr_intopt(n);
+          print("\n");
+          p_branch(lv, g, 'g');
+          print("\n");
+         )
+    )
 }
 
-
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
-
-implement main () = begin
-  print (area);
-  print_newline();
-  print (area2);
-  print_newline()
-end
-
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
-
-val area =
-  PI * radius * radius where {
-    val PI = 3.14 and radius = 11.0
-}
-
-val round =
-  d where {
-    val d = "12"
-}
-
-val tupper = (area, round)
-
-implement main () = begin
-  print (tupper.0);
-  print_newline();
-  print (tupper.1);
-  print_newline();
-end
-
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
-
-val a = 'O';
-
-implement main () = begin
-  print ('\{'); // this need the \ or there is an error
-  print (a);
-  print ('}');
-  print_newline();
-end
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
-
-val a = "this worked\n"
-
-// another way to do main
+fun insert(s: stree, i: int): stree = let
+  fun ins_a (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let a = insert(a, I) in
+        (a, i b, j, c, k, d, l, e, m, f, n, g)
+  and ins_b (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let b = insert(b, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_c (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let c = insert(c, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_d (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let d = insert(d, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_e (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let e = insert(e, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_f (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let f = insert(f, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_g (s: stree, I: int) stree =
+    case+ s of | empty() => ins_(s, I)
+    | (a, i, b, j, c, k, d, l, e, m, f, n, g) =>
+        let g = insert(g, I) in
+        (a, i, b, j, c, k, d, l, e, m, f, n, g)
+  and ins_ (s: stree, I: int): stree =
+    case+ s of
+    | empty() => branch(empty(), no_i(),
+                        empty(), no_i(),
+                        empty(), no_i(),
+                        empty(), an_i(I),
+                        empty(), no_i(),
+                        empty(), no_i(),
+                        empty())
+    | branch(a, i,
+             b, j,
+             c, k,
+             d, l,
+             e, m,
+             f, n,
+             g) => let
+          val pos = case+ l of
+                    | no_i() => 0
+                    | an_i(v) where v = I => 0
+                    | an_i(v) where v > I => -1
+                    | an_i(v) where v < I => 1
+  
 implement main () = (
-  print (a);
-  print (a);
-  print (a)
+  pp();
+  pr_btree(empty());
+  pp();
+  pr_btree(branch(empty(), an_i(3), empty()));
+  pp();
+  pr_btree(branch(branch(empty(), an_i(~1), empty()), an_i(3), empty()));
+  pp();
+  pr_btree(insert(empty(), 3));
+  pp();
+  pr_btree(t) where {
+    val t = insert(empty(), 3)
+    val t = insert(t, 100)
+    val t = insert(t, ~127)
+    val t = insert(t, ~1)
+  };
+  pp();
 )
-(* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
+//// comment to end of file
