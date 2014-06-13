@@ -13,12 +13,13 @@ val area2 =
 
 (* **** **** **** **** **** **** **** **** **** **** **** **** **** **** **** *)
 
-implement main () = begin
-  print "\n\n\n";
-  print (area);
-  print "\n\n\n";
-  print (area2);
-  print "\n\n\n";
-  0
+implement main () = let
+  val () = print "\n\n\n";
+  val () = print (area);
+  val () = print "\n\n\n";
+  val () = print (area2);
+  val () = print "\n\n\n";
+in
+0
 end
 

@@ -20,4 +20,3 @@ implement main () = begin
   print_newline();
   0
 end
-
