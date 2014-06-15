@@ -1,6 +1,11 @@
 #!/bin/sh
 
-patscc -DATS_MEMALLOC_LIBC $1.dats -o $1 &&
-	./$1 &&
-	rm $1 ${1}_dats.c
+TARGET=$(dirname ${1})/$(basename ${1} .dats)
+
+make ${TARGET}_ex &&
+     echo "\n\n\n"  &&
+     ./${TARGET}_ex;
+     echo ${TARGET} returned $? &&
+     echo "\n\n\n"  &&
+     make clean
 
