@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TARGET=$(dirname ${1})/$(basename ${1} .dats)
+TARGET=$(dirname ${1}*)/$(basename ${1}* .dats)
 
 make ${TARGET}_ex &&
      echo "\n\n\n"  &&
