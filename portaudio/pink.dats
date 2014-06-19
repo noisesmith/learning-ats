@@ -7,7 +7,7 @@
 
 #define ATS_DYNLOADFLAG 0
 
-%{
+(*
 
 /*
  * $Id: paex_pink.c 1752 2011-09-08 03:21:55Z philburk $
@@ -47,6 +47,10 @@
  * license above.
  */
 
+*)
+
+%{
+
 #include <stdio.h>
 #include <math.h>
 #include "portaudio.h"
@@ -54,6 +58,10 @@
 #define PINK_MAX_RANDOM_ROWS   (30)
 #define PINK_RANDOM_BITS       (24)
 #define PINK_RANDOM_SHIFT      ((sizeof(long)*8)-PINK_RANDOM_BITS)
+
+%}
+
+%{
 
 typedef struct
 {
@@ -65,7 +73,13 @@ typedef struct
 }
 PinkNoise;
 
-/* Prototypes */
+%}
+
+(* Prototypes *)
+
+%{
+
+
 static unsigned long GenerateRandomNumber( void );
 void InitializePinkNoise( PinkNoise *pink, int numRows );
 float GeneratePinkNoise( PinkNoise *pink );
@@ -79,6 +93,10 @@ static unsigned long GenerateRandomNumber( void )
     randSeed = (randSeed * 196314165) + 907633515;
     return randSeed;
 }
+
+%}
+
+%{
 
 /************************************************************/
 /* Setup PinkNoise structure for N rows of generators. */
@@ -158,15 +176,22 @@ typedef struct
 }
 paTestData;
 
+%}
+
+(*
 /* This routine will be called by the PortAudio engine when audio is needed.
 ** It may called at interrupt level on some machines so don't do anything
 ** that could mess up the system like calling malloc() or free().
 */
+*)
+
+%{
+
 static int patestCallback(const void*                     inputBuffer,
                           void*                           outputBuffer,
                           unsigned long                   framesPerBuffer,
-                                      const PaStreamCallbackTimeInfo* timeInfo,
-                                      PaStreamCallbackFlags           statusFlags,
+                          const PaStreamCallbackTimeInfo* timeInfo,
+                          PaStreamCallbackFlags           statusFlags,
                           void*                           userData)
 {
     int finished;
@@ -195,8 +220,11 @@ static int patestCallback(const void*                     inputBuffer,
     data->sampsToGo -= numFrames;
     return finished;
 }
+%}
 
-/*******************************************************************/
+%{
+
+
 int main(void);
 int main(void)
 {
